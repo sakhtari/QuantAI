@@ -1,0 +1,7 @@
+// For training enter in the command line following command:
+
+python train.py --data VisDrone.yaml --weights yolov5s.pt --img 640
+
+// For data streaming following command:
+
+ffmpeg -re -i "DJI_0798.mp4" -c:v copy -c:a aac -ar 44100 -ac 1 -f flv rtmp://localhost/live/stream
