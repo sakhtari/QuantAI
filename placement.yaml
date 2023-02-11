@@ -1,0 +1,13 @@
+---
+products:
+  redbull:
+    xmin: 15
+    ymin: 15
+    xmax: 30 
+    ymax: 30
+  rockstar:
+    xmin: 15
+    ymin: 15
+    xmax: 30 
+    ymax: 30
+
