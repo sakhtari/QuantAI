@@ -1,11 +1,11 @@
 ---
-products:
-  redbull:
+shelf:
+  - name: redbull
     xmin: 15
     ymin: 15
     xmax: 30 
     ymax: 30
-  rockstar:
+  - name: rockstar
     xmin: 15
     ymin: 15
     xmax: 30 

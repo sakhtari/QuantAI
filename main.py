@@ -48,14 +48,19 @@ def send_img(frame):
     p.stdin.write(frame.tobytes())"""
 
 
-def check_misplacement(product_name: str, top_left: tuple, bottom_right: tuple, shelf_config: dict) -> bool:
-    top_lef_allowed = ( int(shelf_config['products'][product_name]['xmin']), int(shelf_config['products'][product_name]['ymin']) )
-    bottom_right_allowed = ( int(shelf_config['products'][product_name]['xmax']), int(shelf_config['products'][product_name]['ymax']) )
+def check_placement(top_left: tuple, bottom_right: tuple, shelf_config: dict) -> str:
+    #top_lef_allowed = ( int(shelf_config['products'][product_name]['xmin']), int(shelf_config['products'][product_name]['ymin']) )
+    #bottom_right_allowed = ( int(shelf_config['products'][product_name]['xmax']), int(shelf_config['products'][product_name]['ymax']) )
 
-    if (top_left < top_lef_allowed or bottom_right > bottom_right_allowed):
-        return True
-    else:
-        return False
+    for product in shelf_config['shelf']:
+        top_left_allowed = (product['xmin'], product['ymin'])
+        bottom_right_allowed = (product['xmax'], product['ymax'])
+
+        if top_left > top_left_allowed or bottom_right < bottom_right_allowed:
+            # shelf placement found
+            return product['name']
+
+    raise Exception('Product not on shelf')
 
 
 def draw_rectangles(frame, df):
@@ -73,21 +78,25 @@ def draw_rectangles(frame, df):
         top_left = (int(row['xmin']), int(row['ymin']))
         bottom_right = (int(row['xmax']), int(row['ymax']))
 
-        misplaced: bool = check_misplacement(row['name'], top_left, bottom_right, shelf_config)
-        if misplaced:
-            #TODO send misplacment message to ADX and upload picture to blob
-            pass
-        else:
-            pass
-
-        color_hex = (color_df.loc[row["class"]]["hex"]).lstrip('#')
-        color_rgb = tuple(int(color_hex[i:i+2], 16) for i in (0, 2, 4))
-        frame = cv2.rectangle(frame, top_left, bottom_right, color_rgb, thickness)
         try:
+            shelf_placing: str = check_placement(top_left, bottom_right, shelf_config)
+
+            if row['name'] == shelf_placing:
+                #TODO no displacement
+                pass
+            else:
+                #TODO misplacement detected, invalidate scale data for 'shelf_placing'
+                pass
+
+
+            color_hex = (color_df.loc[row["class"]]["hex"]).lstrip('#')
+            color_rgb = tuple(int(color_hex[i:i+2], 16) for i in (0, 2, 4))
+            frame = cv2.rectangle(frame, top_left, bottom_right, color_rgb, thickness)
+
             desc = "{} {}%".format(row['name'], int(row['confidence']*100))
             cv2.putText(frame, desc, (int(row['xmin']), int(row['ymin'])-6), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color_rgb, thickness)
-        except:
-            pass
+        except Exception as e:
+            print(e)
             
     return frame
 
